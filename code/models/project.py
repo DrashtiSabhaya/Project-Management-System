@@ -20,7 +20,7 @@ class ProjectModel:
     project_color_identity = db.Column(db.String(20), unique=True)
 
     tasks = db.relationship('taskModel', lazy='dynamic')
-    
+
     def __init__(self, name, description, created_by_id, project_color_identity):
         self.name = name
         self.description = description
@@ -45,6 +45,10 @@ class ProjectModel:
     @classmethod
     def find_by_id(cls, id):
         return ProjectModel.query.filter_by(id=id).first()
+
+    @classmethod
+    def all_projects(cls):
+        return cls.query.all()
 
     def save_to_db(self):
         db.session.add(self)

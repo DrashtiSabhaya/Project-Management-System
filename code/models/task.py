@@ -28,6 +28,10 @@ class TaskModel(db.Model):
     def find_by_name(cls, name):
         return TaskModel.query.filter_by(task_name=name).first()
 
+    @classmethod
+    def all_tasks(cls):
+        return cls.query.all()
+
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()

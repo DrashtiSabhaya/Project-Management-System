@@ -1,4 +1,4 @@
-from config import db
+from db import db
 
 
 class PermissionModel(db.Model):
@@ -15,6 +15,7 @@ class PermissionModel(db.Model):
 
     def json(self):
         return {
+            "id": self.id,
             "name": self.name,
             "description": self.description
         }
@@ -26,6 +27,10 @@ class PermissionModel(db.Model):
     @classmethod
     def find_by_id(cls, id):
         return PermissionModel.query.filter_by(id=id).first()
+
+    @classmethod
+    def all_permissions(cls):
+        return cls.query.all()
 
     def save_to_db(self):
         db.session.add(self)

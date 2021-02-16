@@ -11,8 +11,6 @@ class UserModel(db.Model):
     password = db.Column(db.String(80), nullable=False)
     active_status = db.Column(db.Boolean, default=True)
 
-    projects = db.relationship('ProjectModel', backref='user')
-
     def __init__(self, name, username, password):
         self.name = name
         self.username = username
@@ -33,6 +31,10 @@ class UserModel(db.Model):
     @classmethod
     def find_by_id(cls, id):
         return UserModel.query.filter_by(id=id).first()
+
+    @classmethod
+    def all_users(cls):
+        return cls.query.all()
 
     def save_to_db(self):
         db.session.add(self)
