@@ -4,15 +4,11 @@ from flask_jwt_extended import (
     jwt_required,
     create_access_token,
     create_refresh_token,
-    get_jti,
     get_jwt_identity,
     get_jwt
 )
 from models.user import UserModel
 from datetime import timedelta
-
-
-ACCESS_EXPIRES = timedelta(hours=1)
 
 _user_parser = reqparse.RequestParser()
 _user_parser.add_argument(
@@ -40,6 +36,7 @@ class User(Resource):
         return user.json()
 
     @classmethod
+    @jwt_required()
     def delete(cls, user_id):
         user = UserModel.find_by_id(user_id)
         if not user:
@@ -53,7 +50,7 @@ class UserRegister(Resource):
         _user_parser.add_argument(
             'name',
             type=str,
-            required=True,
+            required=False,
             help="Name is Required!"
         )
         data = _user_parser.parse_args()
@@ -100,6 +97,7 @@ class UserLogout(Resource):
 
 class UserStatus(Resource):
     @classmethod
+    @jwt_required()
     def put(cls, user_id):
         user = UserModel.find_by_id(user_id)
         if not user:

@@ -12,6 +12,14 @@ from resources.user import (
     UsersList
 )
 from resources.permission import Permission, PermissionsList
+from resources.task import Task, ProjectTaskList, TaskList
+from resources.shareproject import ShareProject
+from resources.project import (
+    Project,
+    ProjectsList,
+    UserProjectList,
+    SharedProjects
+)
 
 
 app = Flask(__name__)
@@ -26,6 +34,8 @@ app.secret_key = 'Project_Management_System'
 api = Api(app)
 
 jwt = JWTManager(app)
+
+blacklist = set()
 
 
 @app.before_first_request
@@ -65,6 +75,7 @@ def revoked_token_callback():
     }), 401
 
 
+# User EndPoints
 api.add_resource(UserRegister, '/register')
 api.add_resource(UserLogin, '/login')
 api.add_resource(UserLogout, '/logout')
@@ -72,9 +83,24 @@ api.add_resource(User, '/user/<int:user_id>')
 api.add_resource(UserStatus, '/changestatus/<int:user_id>')
 api.add_resource(UsersList, '/users')
 
+# Permission EndPoints
 api.add_resource(Permission, '/permission/<string:name>')
 api.add_resource(PermissionsList, '/permissions')
 
+# Project EndPoints
+api.add_resource(Project, '/project/<string:name>')
+api.add_resource(ProjectsList, '/projects')
+api.add_resource(UserProjectList, '/myproject')
+api.add_resource(SharedProjects, '/shared_project/<string:name>')
+
+# Project Sharing EndPoints
+api.add_resource(ShareProject, '/project/share')
+
+
+# Task EndPoints
+api.add_resource(Task, '/task/<string:name>')
+api.add_resource(ProjectTaskList, '/project/tasks/<string:name>')
+api.add_resource(TaskList, '/tasks')
 
 if __name__ == '__main__':
     from db import db

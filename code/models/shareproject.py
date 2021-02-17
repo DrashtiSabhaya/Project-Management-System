@@ -14,10 +14,10 @@ class ShareProjectModel(db.Model):
     project = db.relationship('ProjectModel')
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), default=None)
-    user = db.relationshop('UserModel')
+    user = db.relationship('UserModel')
 
     permission_id = db.Column(db.Integer, db.ForeignKey('permission.id'))
-    permission = db.relationshop('PermissionModel')
+    permission = db.relationship('PermissionModel')
 
     def __init__(self, project_id, user_id, permission_id):
         self.project_id = project_id
@@ -34,8 +34,16 @@ class ShareProjectModel(db.Model):
         }
 
     @classmethod
-    def find_by_id(cls, id):
-        return ShareProjectModel.query.filter_by(user_id=id).all()
+    def find_by_user_id(cls, id):
+        return cls.query.filter_by(user_id=id).all()
+
+    @classmethod
+    def find_by_project_id(cls, id):
+        return cls.query.filter_by(project_id=id).all()
+    
+    @classmethod
+    def get_user_permissions(cls, user_id, project_id):
+        return cls.query.filter_by(user_id=user_id, project_id=project_id).first()
 
     def save_to_db(self):
         db.session.add(self)

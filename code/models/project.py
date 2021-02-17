@@ -5,11 +5,11 @@ import datetime
 from sqlalchemy import DateTime
 
 
-class ProjectModel:
+class ProjectModel(db.Model):
 
     __tablename__ = 'project'
 
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True)
+    id = db.Column('id', db.Text(length=36), default=lambda: str(uuid.uuid4()), primary_key=True)
     name = db.Column(db.String(60), unique=True)
     description = db.Column(db.Text)
 
@@ -19,7 +19,8 @@ class ProjectModel:
     created_at = db.Column(DateTime, default=datetime.datetime.now)
     project_color_identity = db.Column(db.String(20), unique=True)
 
-    tasks = db.relationship('taskModel', lazy='dynamic')
+    tasks = db.relationship('TaskModel', cascade="all,delete")
+    users = db.relationship('ShareProjectModel', cascade="all,delete")
 
     def __init__(self, name, description, created_by_id, project_color_identity):
         self.name = name
@@ -35,16 +36,17 @@ class ProjectModel:
             "created_by": self.created_by.name,
             "created_at": str(self.created_at).split('.')[0],
             "project_color_identity": self.project_color_identity,
-            "tasks": [task.json() for task in self.tasks.all()]
+            "tasks": [task.json() for task in self.tasks],
+            "users": [user.json() for user in self.users]
         }
 
     @classmethod
     def find_by_name(cls, name):
-        return ProjectModel.query.filter_by(name=name).first()
+        return cls.query.filter_by(name=name).first()
 
     @classmethod
-    def find_by_id(cls, id):
-        return ProjectModel.query.filter_by(id=id).first()
+    def find_by_owner_id(cls, owner_id):
+        return cls.query.filter_by(created_by_id=owner_id)
 
     @classmethod
     def all_projects(cls):

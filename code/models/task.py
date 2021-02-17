@@ -29,6 +29,10 @@ class TaskModel(db.Model):
         return TaskModel.query.filter_by(task_name=name).first()
 
     @classmethod
+    def find_by_project_id(cls, project_id):
+        return TaskModel.query.filter_by(project_id=project_id).all()
+
+    @classmethod
     def all_tasks(cls):
         return cls.query.all()
 
