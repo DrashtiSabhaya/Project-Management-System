@@ -12,8 +12,8 @@ Requirements
 Steps to run Apis
 -----------------
 1. Set up a virtual environment to use for our application ($ python3 -m venv env)
-2. Install all libraries using requirements.txt file
-3. Switch into /code dir
+2. Install all libraries using requirements.txt file (run : pip install -r requirements.txt)
+3. Switch into /code dir (cd code)
 4. Run command : python app.py in console
 
 # APIs
