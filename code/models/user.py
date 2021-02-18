@@ -1,5 +1,18 @@
 from db import db
 
+################################################
+# Class     : UserModel          
+# Table     : user               
+# Fields    : id, name,
+#             username,  
+#             password
+# Methods   : 1. json(self)
+#             2. find_by_username(cls, username)  
+#             3. find_by_id(cls, id)
+#             4. all_users(cls)
+#             5. save_to_db(self)
+#             6. delete_from_db(self)
+#################################################
 
 class UserModel(db.Model):
 

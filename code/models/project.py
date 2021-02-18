@@ -4,6 +4,21 @@ import uuid
 import datetime
 from sqlalchemy import DateTime
 
+###############################################
+# Class     : ProjectModel          
+# Table     : project               
+# Fields    : id, name, description,
+#             created_by_id,
+#             created_at
+# ForeignKey: UserModel
+# Methods   : 1. json(self)
+#             2. find_by_name(cls, name)  
+#             3. find_by_owner_id(cls, owner_id)
+#             4. all_projects(cls)
+#             5. save_to_db(self)
+#             6. delete_from_db(self)
+#################################################
+
 
 class ProjectModel(db.Model):
 
@@ -28,6 +43,8 @@ class ProjectModel(db.Model):
         self.created_by_id = created_by_id
         self.project_color_identity = project_color_identity
 
+
+    ## Return : Json Represent of Calling Object    
     def json(self):
         return {
             "id": self.id,
@@ -40,22 +57,29 @@ class ProjectModel(db.Model):
             "users": [user.json() for user in self.users]
         }
 
+    ## Parameter(name) : Project name 
+    ## Return : Project Matched with Given Name 
     @classmethod
     def find_by_name(cls, name):
         return cls.query.filter_by(name=name).first()
 
+    ## Parameter(owner_id) : Project Owner id 
+    ## Return : All Projects Owned by Given Owner_id
     @classmethod
     def find_by_owner_id(cls, owner_id):
         return cls.query.filter_by(created_by_id=owner_id)
 
+    ## Return : All Projects  
     @classmethod
     def all_projects(cls):
         return cls.query.all()
 
+    ## Save or Update Project in Database
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
 
+    ## Delete Project from Database
     def delete_from_db(self):
         db.session.delete(self)
         db.session.commit()

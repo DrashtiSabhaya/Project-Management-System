@@ -3,6 +3,22 @@ from models.user import UserModel
 from models.project import ProjectModel
 from models.permissions import PermissionModel
 
+################################################
+# Class     : ShareProjectModel          
+# Table     : sharedproject               
+# Fields    : id, project_id,
+#             user_id,
+#             permission_id
+# ForeignKey: UserModel, ProjectModel, 
+#             Permission Model
+# Methods   : 1. json(self)
+#             2. find_by_user_id(cls, id)  
+#             3. find_by_project_id(cls, id)
+#             4. get_user_permissions(cls, user_id, project_id)
+#             5. save_to_db(self)
+#             6. delete_from_db(self)
+#################################################
+
 
 class ShareProjectModel(db.Model):
 
@@ -24,6 +40,8 @@ class ShareProjectModel(db.Model):
         self.user_id = user_id
         self.permission_id = permission_id
 
+
+    ## Return : Json Represent of Calling Object    
     def json(self):
         return {
             "project_id": self.project_id,

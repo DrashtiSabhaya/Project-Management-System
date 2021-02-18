@@ -11,16 +11,15 @@ from resources.user import (
     UserStatus,
     UsersList
 )
-from resources.permission import Permission, PermissionsList
-from resources.task import Task, ProjectTaskList, TaskList
-from resources.shareproject import ShareProject
 from resources.project import (
     Project,
     ProjectsList,
     UserProjectList,
     SharedProjects
 )
-
+from resources.task import Task, ProjectTaskList, TaskList
+from resources.shareproject import ShareProject
+from resources.permission import Permission, PermissionsList
 
 app = Flask(__name__)
 
@@ -83,24 +82,24 @@ api.add_resource(User, '/user/<int:user_id>')
 api.add_resource(UserStatus, '/changestatus/<int:user_id>')
 api.add_resource(UsersList, '/users')
 
-# Permission EndPoints
-api.add_resource(Permission, '/permission/<string:name>')
-api.add_resource(PermissionsList, '/permissions')
-
 # Project EndPoints
 api.add_resource(Project, '/project/<string:name>')
 api.add_resource(ProjectsList, '/projects')
 api.add_resource(UserProjectList, '/myproject')
 api.add_resource(SharedProjects, '/shared_project/<string:name>')
 
+# Permission EndPoints
+api.add_resource(Permission, '/permission/<string:name>')
+api.add_resource(PermissionsList, '/permissions')
+
 # Project Sharing EndPoints
 api.add_resource(ShareProject, '/project/share')
-
 
 # Task EndPoints
 api.add_resource(Task, '/task/<string:name>')
 api.add_resource(ProjectTaskList, '/project/tasks/<string:name>')
 api.add_resource(TaskList, '/tasks')
+
 
 if __name__ == '__main__':
     from db import db

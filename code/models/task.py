@@ -1,5 +1,20 @@
 from db import db
 
+################################################
+# Class     : TaskModel          
+# Table     : sharedproject               
+# Fields    : id, task,
+#             description,  
+#             project_id
+# ForeignKey: ProjectModel, 
+# Methods   : 1. json(self)
+#             2. find_by_name(cls, name)  
+#             3. find_by_project_id(cls, id)
+#             4. all_tasks(cls)
+#             5. save_to_db(self)
+#             6. delete_from_db(self)
+#################################################
+
 
 class TaskModel(db.Model):
 
