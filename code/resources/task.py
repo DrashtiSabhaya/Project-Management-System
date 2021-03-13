@@ -181,7 +181,7 @@ class Task(Resource):
             task = TaskModel.find_by_name(name, project.id)
             if task:
                 if project.created_by_id == get_jwt_identity():
-                    # task.delete_from_db()
+                    ## task.delete_from_db()
                     task.isDeleted = 0
                     task.deletedDate = datetime.datetime.now()
                     task.save_to_db()
