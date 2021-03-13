@@ -6,6 +6,7 @@ from flask_jwt_extended import (
 
 from models.project import ProjectModel
 from models.shareproject import ShareProjectModel
+import datetime
 
 
 class Project(Resource):
@@ -54,7 +55,7 @@ class Project(Resource):
             'name',
             type=str,
             required=False,
-            help="Project Description is required"
+            help="Project Name is required"
         )
         project_parse.add_argument(
             'description',
@@ -109,7 +110,10 @@ class Project(Resource):
 
         if project:
             if project.created_by_id == get_jwt_identity():
-                project.delete_from_db()
+                # project.delete_from_db()
+                project.isDeleted = 0
+                project.deletedDate = datetime.datetime.now()
+                project.save_to_db()
                 return {"message": "Project is Deleted"}, 200
 
             else:
@@ -117,7 +121,11 @@ class Project(Resource):
                     get_jwt_identity(), project.id)
                 if user:
                     if user.permission.name == 'Delete':
-                        project.delete_from_db()
+                        # project.delete_from_db()
+                        project.isDeleted = 0
+                        project.deletedDate = datetime.datetime.now()
+                        project.save_to_db()
+
                         return {"message": "Project is Deleted"}, 200
 
                     return {"message": "You Don't have enough permissions to Delete the Project"}, 401

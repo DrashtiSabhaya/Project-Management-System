@@ -7,12 +7,23 @@ from flask_jwt_extended import (
 from models.task import TaskModel
 from models.project import ProjectModel
 from models.shareproject import ShareProjectModel
+import datetime
 
 
 class Task(Resource):
     @jwt_required()
     def get(self, name):
-        task = TaskModel.find_by_name(name)
+        task_parse = reqparse.RequestParser()
+
+        task_parse.add_argument(
+            'project_name',
+            type=str,
+            required=True,
+            help="Project Name is required"
+        )
+        data = task_parse.parse_args()
+        project = ProjectModel.find_by_name(data['project_name'])
+        task = TaskModel.find_by_name(name, project.id)
         if task:
             return task.json()
         return {"message": "Task with given name Doesn't Exists"}, 404
@@ -38,20 +49,31 @@ class Task(Resource):
             required=True,
             help="Project Name is required"
         )
-
+        task_parse.add_argument(
+            'status',
+            type=str,
+            required=False,
+        )
+        task_parse.add_argument(
+            'user_id',
+            type=str,
+            required=False,
+        )
         data = task_parse.parse_args()
 
         project = ProjectModel.find_by_name(data['project_name'])
         if project:
             if project.created_by_id == get_jwt_identity():
-                task = TaskModel.find_by_name(name)
+                task = TaskModel.find_by_name(name, project.id)
                 if task and task.project_id == project.id:
                     return {"message": "Task with Given Name is Already exist in Same Project"}, 401
 
                 task = TaskModel(
                     data['task_name'],
                     data['description'],
-                    project.id
+                    project.id,
+                    data['status'],
+                    data['user_id']
                 )
                 task.save_to_db()
 
@@ -81,18 +103,36 @@ class Task(Resource):
             required=True,
             help="Project Name is required"
         )
+        task_parse.add_argument(
+            'status',
+            type=str,
+            required=False,
+        )
+        task_parse.add_argument(
+            'user_id',
+            type=str,
+            required=False,
+        )
+
         data = task_parse.parse_args()
 
         project = ProjectModel.find_by_name(data['project_name'])
         if project:
-            task = TaskModel.find_by_name(name)
-            if task and project.id == task.project_id:
+            task = TaskModel.find_by_name(name, project.id)
+            if task and task.project_id == project.id:
                 if project.created_by_id == get_jwt_identity():
                     if data['task_name'] is not None:
                         task.task_name = data['task_name']
 
                     if data['description'] is not None:
                         task.description = data['description']
+
+                    if data['status'] is not None:
+                        task.status = data['status']
+
+                    if data['user_id'] is not None:
+                        task.user_id = data['user_id']
+
                     task.project_id = project.id
                     task.save_to_db()
                     return {"message": "Task Details Updated"}, 200
@@ -108,12 +148,18 @@ class Task(Resource):
                             if data['description'] is not None:
                                 task.description = data['description']
 
+                            if data['status'] is not None:
+                                task.status = data['status']
+
+                            if data['user_id'] is not None:
+                                task.user_id = data['user_id']
+
                             task.project_id = project.id
 
                             task.save_to_db()
                             return {"message": "Task Details Updated"}, 200
 
-                    return {"message": "You Don't have enough permissions to Add Task in the Project"}, 401
+                    return {"message": "You Don't have enough permissions to Edit Task in the Project"}, 401
 
             return {"message": "Task Doesn't Exist in this Project"}, 401
 
@@ -132,10 +178,13 @@ class Task(Resource):
 
         project = ProjectModel.find_by_name(data['project_name'])
         if project:
-            task = TaskModel.find_by_name(name)
-            if task and project.id == task.project_id:
+            task = TaskModel.find_by_name(name, project.id)
+            if task:
                 if project.created_by_id == get_jwt_identity():
-                    task.delete_from_db()
+                    # task.delete_from_db()
+                    task.isDeleted = 0
+                    task.deletedDate = datetime.datetime.now()
+                    task.save_to_db()
                     return {"message": "Task is Deleted"}, 200
 
                 return {"message": "You Don't have enough permissions to Add Task in the Project"}, 401

@@ -46,21 +46,26 @@ class ShareProject(Resource):
         if permission is None:
             return {"message": "Inavlid Permission Name"}, 404
 
-        if user.id == get_jwt_identity():
+        if user.id == get_jwt_identity() and user.id == project.created_by_id:
             return {"message": "You are owner of this Project, Please Select Other User to Share Project"}
 
         if user:
             if user.active_status:
                 if project.created_by_id == get_jwt_identity():
-                    share_project = ShareProjectModel(
-                        project.id, user.id, permission.id)
-                    share_project.save_to_db()
-                    return {"message": "Project is Shared Successfully"}, 200
+                    userExist = ShareProjectModel.get_user_permissions(
+                        user.id, project.id)
+                    if userExist:
+                        userExist.permission_id = permission.id
+                        userExist.save_to_db()
+                        return {"message": "User Permission Changed"}, 200
+                    else:
+                        share_project = ShareProjectModel(
+                            project.id, user.id, permission.id)
+                        share_project.save_to_db()
+                        return {"message": "Project is Shared Successfully"}, 200
 
                 return {"message": "You don't have Permission to Share this Project"}, 401
 
             return {"message": "User is Not Active"}, 401
 
         return {"message": "User with Given Name Doesn't Exist"}, 404
-
-    

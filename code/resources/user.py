@@ -5,10 +5,11 @@ from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
     get_jwt_identity,
-    get_jwt
+    get_jwt,
 )
 from models.user import UserModel
 from datetime import timedelta
+import datetime
 
 _user_parser = reqparse.RequestParser()
 _user_parser.add_argument(
@@ -60,8 +61,19 @@ class UserRegister(Resource):
 
         user = UserModel(**data)
         user.save_to_db()
+        print("Userd id = ", user.id)
+        expires = datetime.timedelta(days=8)
 
-        return {"message": "User Created Successfully!"}, 201
+        access_token = create_access_token(
+            identity=user.id,  expires_delta=expires, fresh=True)
+        refresh_token = create_refresh_token(user.id)
+
+        return {
+            "message": "User Created Successfully!",
+            "username": data["username"],
+            'access_token': access_token,
+            'refresh_token': refresh_token
+        }, 201
 
 
 class UserLogin(Resource):
@@ -73,11 +85,13 @@ class UserLogin(Resource):
         if user:
             if user.active_status:
                 if safe_str_cmp(user.password, data['password']):
+                    expires = datetime.timedelta(days=8)
                     access_token = create_access_token(
-                        identity=user.id, fresh=True)
+                        identity=user.id, fresh=True, expires_delta=expires)
                     refresh_token = create_refresh_token(user.id)
 
                     return {
+                        'username': user.username,
                         'access_token': access_token,
                         'refresh_token': refresh_token
                     }, 200
@@ -116,3 +130,13 @@ class UsersList(Resource):
     @jwt_required()
     def get(self):
         return {'users': [user.json() for user in UserModel.all_users()]}, 200
+
+
+# class TokenRefresh(Resource):
+#     @jwt_refresh_token_required
+#     def post(self):
+#         # retrive the user's identity from the refresh token using a Flask-JWT-Extended built-in method
+#         current_user = get_jwt_identity()
+#         # return a non-fresh token for the user
+#         new_token = create_access_token(identity=current_user, fresh=False)
+#         return {'access_token': new_token}, 200
