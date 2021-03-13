@@ -80,6 +80,7 @@ class ProjectModel(db.Model):
     def all_projects(cls):
         return cls.query.order_by(cls.created_at.desc()).filter_by(isDeleted=1)
 
+
     # Save or Update Project in Database
     def save_to_db(self):
         db.session.add(self)
