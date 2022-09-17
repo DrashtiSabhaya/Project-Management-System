@@ -1,4 +1,4 @@
-# Project_Management_System
+# Project-Management-System
 
 This Repo contains all required Flask APIs for Project Management System.
 
